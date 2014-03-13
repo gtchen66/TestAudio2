@@ -29,6 +29,11 @@
                     <state key="normal" title="Record">
                         <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
                     </state>
+                    <userDefinedRuntimeAttributes>
+                        <userDefinedRuntimeAttribute type="number" keyPath="layer.cornerRadius">
+                            <integer key="value" value="10"/>
+                        </userDefinedRuntimeAttribute>
+                    </userDefinedRuntimeAttributes>
                     <connections>
                         <action selector="onRecordButton:" destination="-1" eventType="touchUpInside" id="ZJj-9N-B2B"/>
                     </connections>

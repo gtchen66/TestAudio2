@@ -10,4 +10,7 @@
 
 @interface MyDrawingView : UIView
 
+@property (nonatomic, strong) NSData *myData;
+@property int method;
+
 @end

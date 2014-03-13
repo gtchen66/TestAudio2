@@ -8,10 +8,11 @@
 
 #import <UIKit/UIKit.h>
 #import <AVFoundation/AVFoundation.h>
+#import "MyDrawingView.h"
 
-@interface MyViewController : UIViewController <AVAudioPlayerDelegate, AVAudioRecorderDelegate> {
-    AVAudioPlayer *audioPlayer;
-    AVAudioRecorder *audioRecorder;
-}
+@interface MyViewController : UIViewController <AVAudioPlayerDelegate, AVAudioRecorderDelegate>
+
+@property (strong, nonatomic) AVAudioPlayer *audioPlayer;
+@property (strong, nonatomic) AVAudioRecorder *audioRecorder;
 
 @end
