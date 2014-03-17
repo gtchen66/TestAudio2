@@ -12,5 +12,6 @@
 
 @property (nonatomic, strong) NSData *myData;
 @property int method;
+@property float percentComplete;
 
 @end

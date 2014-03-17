@@ -22,6 +22,7 @@
 		B52EE78218C7CEC00057D765 /* MyViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = B52EE78018C7CEC00057D765 /* MyViewController.m */; };
 		B52EE78318C7CEC00057D765 /* MyViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = B52EE78118C7CEC00057D765 /* MyViewController.xib */; };
 		B52EE78618C7CF710057D765 /* MyDrawingView.m in Sources */ = {isa = PBXBuildFile; fileRef = B52EE78518C7CF710057D765 /* MyDrawingView.m */; };
+		B547780418D54FD900A64970 /* Accelerate.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B547780318D54FD900A64970 /* Accelerate.framework */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -56,6 +57,7 @@
 		B52EE78118C7CEC00057D765 /* MyViewController.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = MyViewController.xib; sourceTree = "<group>"; };
 		B52EE78418C7CF710057D765 /* MyDrawingView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MyDrawingView.h; sourceTree = "<group>"; };
 		B52EE78518C7CF710057D765 /* MyDrawingView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MyDrawingView.m; sourceTree = "<group>"; };
+		B547780318D54FD900A64970 /* Accelerate.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Accelerate.framework; path = System/Library/Frameworks/Accelerate.framework; sourceTree = SDKROOT; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -66,6 +68,7 @@
 				B52EE75318C7CE810057D765 /* CoreGraphics.framework in Frameworks */,
 				B52EE75518C7CE810057D765 /* UIKit.framework in Frameworks */,
 				B52EE75118C7CE810057D765 /* Foundation.framework in Frameworks */,
+				B547780418D54FD900A64970 /* Accelerate.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -104,6 +107,7 @@
 		B52EE74F18C7CE810057D765 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				B547780318D54FD900A64970 /* Accelerate.framework */,
 				B52EE75018C7CE810057D765 /* Foundation.framework */,
 				B52EE75218C7CE810057D765 /* CoreGraphics.framework */,
 				B52EE75418C7CE810057D765 /* UIKit.framework */,
@@ -373,6 +377,7 @@
 		B52EE77A18C7CE810057D765 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = LaunchImage;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
@@ -388,6 +393,7 @@
 		B52EE77B18C7CE810057D765 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = LaunchImage;
 				CODE_SIGN_IDENTITY = "iPhone Developer";

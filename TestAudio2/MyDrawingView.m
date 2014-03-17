@@ -7,6 +7,15 @@
 //
 
 #import "MyDrawingView.h"
+#import <Accelerate/Accelerate.h>
+
+@interface MyDrawingView ()
+@property float myMax;
+
+@property float *minFloatArray;
+@property float *maxFloatArray;
+
+@end
 
 @implementation MyDrawingView
 
@@ -24,7 +33,10 @@
     if (self) {
         [self setBackgroundColor:[UIColor greenColor]];
         self.myData = [[NSData alloc] init];
+        self.myMax = 0.0;
         
+        self.minFloatArray = nil;
+        self.maxFloatArray = nil;
     }
     return self;
 }
@@ -32,7 +44,47 @@
 - (void) setMyData:(NSData *)myData {
     _myData = myData;
 //    self.myData = myData;
-    NSLog(@"setting mydata in drawing.  length to %d",self.myData.length);
+    
+    int num_samples = self.myData.length / 2;
+
+    const short *shortArray = (const short *)[self.myData bytes];
+    float *floatArray = (float *)malloc(num_samples * sizeof(float));
+    
+    vDSP_vflt16(shortArray, 1, floatArray, 1, num_samples);
+    
+    float maxValue = 0.0;
+    vDSP_maxmgv(floatArray, 1, &maxValue, num_samples);
+    maxValue = maxValue * 1.1;
+    
+    NSLog(@">>>> setting mydata in drawing.  length to %d",self.myData.length);
+    NSLog(@"maxValue = %f", maxValue);
+    self.myMax = maxValue;
+    
+    float width  = self.frame.size.width;
+    float height = self.frame.size.height;
+
+    if (self.minFloatArray == nil) {
+        // need to allcoate space
+        self.minFloatArray = (float *) malloc(width * sizeof(float));
+        self.maxFloatArray = (float *) malloc(width * sizeof(float));
+    }
+    float *minPtr = self.minFloatArray;
+    float *maxPtr = self.maxFloatArray;
+
+    int samp_per_frame = num_samples / width;
+
+    float *tmpArrayPtr;
+    int i;
+    for (i=0; i<width-2; i++) {
+        int samp_start = i*samp_per_frame;
+        float localMax = 0.0;
+        float localMin = 0.0;
+        tmpArrayPtr = &floatArray[samp_start];
+        vDSP_maxv(tmpArrayPtr, 1, &localMax, samp_per_frame);
+        vDSP_minv(tmpArrayPtr, 1, &localMin, samp_per_frame);
+        *minPtr++ = height/2 + (localMin/maxValue * height/2);
+        *maxPtr++ = height/2 + (localMax/maxValue * height/2);
+    }
 }
 
 // Only override drawRect: if you perform custom drawing.
@@ -44,6 +96,7 @@
     
     CGContextRef ct = UIGraphicsGetCurrentContext();
     CGFloat blue[4] = {0.0f, 0.0f, 1.0f, 1.0f};
+    CGFloat red[4] = {1.0f, 0.0f, 0.0f, 1.0f};
     
     SInt16 *sptr = (SInt16 *)[self.myData bytes];
     
@@ -54,26 +107,14 @@
     CGContextBeginPath(ct);
     CGContextMoveToPoint(ct, 1.0f, height/2);
     int i;
-    // find abs of min/max
-    // first 100 values:
-//    for (i=0; i<num_samples; i++) {
-//        int yval = 0;
-//        if (i < self.myData.length) {
-//            yval = *sptr++;
-//            NSLog(@"initial (%d) = %d",i,yval);
-//        }
-//    }
+    
     // assume 2-bytes per sample
     int num_samples = self.myData.length / 2;
     int samp_per_frame = num_samples / width;
     NSLog(@"samp_per_frame is %d", samp_per_frame);
     
-    float ymax = 0;
-    for (i=0; i<num_samples; i++) {
-        int yval = *sptr++;
-        ymax = MAX(ymax, ABS(yval));
-    }
-    ymax = ymax*1.1f;
+   
+    float ymax = self.myMax;
     
     sptr = (SInt16 *) [self.myData bytes];
     
@@ -94,32 +135,29 @@
         
     } else if (self.method == 2) {
         
+        float *minPtr = self.minFloatArray;
+        float *maxPtr = self.maxFloatArray;
+        
         // method 2
         // for every visible pair of pixel, identify min/max
-        for (i=0; i<width-5; i++) {
-            int samp_start = i*samp_per_frame;
-            int samp_end   = samp_start + (2*samp_per_frame);
-            float yval_min = 0;
-            float yval_max = 0;
-            int yval = 0;
-            int j;
-            for (j=samp_start; j<samp_end; j++) {
-                if (j < self.myData.length) {
-                    yval = *sptr++;
-                    yval_min = MIN(yval_min, yval);
-                    yval_max = MAX(yval_max, yval);
-                    }
-            }
-            int ypos1 = height/2 + (yval_min/ymax * height/2);
-            CGContextAddLineToPoint(ct, i, ypos1);
-            i++;
-            int ypos2 = height/2 + (yval_max/ymax * height/2);
-            CGContextAddLineToPoint(ct, i, ypos2);
-            // NSLog(@"(%d, %f -> %d, %f -> %d", i, yval_min, ypos1, yval_max, ypos2);
+        for (i=0; i<width-2; i++) {
+            CGContextAddLineToPoint(ct, i, *minPtr++);
+            CGContextAddLineToPoint(ct, i, *maxPtr++);
         }
     }
 //    CGContextAddArc(ct, width/2, height/2, width/4, 0, M_PI * 2, 0);
     CGContextStrokePath(ct);
+    
+    // add a vertical line.
+    if (self.percentComplete > 0.0) {
+        float xpos = self.percentComplete * width;
+        CGContextSetStrokeColor(ct, red);
+        CGContextBeginPath(ct);
+        CGContextMoveToPoint(ct, xpos, 0);
+        CGContextAddLineToPoint(ct, xpos, height);
+        CGContextStrokePath(ct);        
+    }
+    
     NSLog(@"done with drawing");
 }
 

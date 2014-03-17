@@ -29,6 +29,10 @@
 @property float StartRecordingTime;
 @property float EndRecordingTime;
 
+@property (strong, nonatomic) NSTimer *myTimer;
+@property float myCurrentTime;
+- (void)updateProgress:(NSTimer *)timer;
+
 @end
 
 @implementation MyViewController
@@ -178,6 +182,10 @@ struct CAFAudioFormat {
         NSLog(@"Error: %@",[error localizedDescription]);
         self.outStatusLabel.text = @"Error";
     } else {
+        
+        NSLog(@"playback will be %f seconds long",self.audioPlayer.duration);
+        
+        
         [self.audioPlayer prepareToPlay];
         [self.audioPlayer play];
         self.outStatusLabel.text = @"P1 started";
@@ -188,6 +196,9 @@ struct CAFAudioFormat {
     
     NSDictionary *dict = self.audioPlayer.settings;
     NSLog(@"sample rate is: %@", dict[AVSampleRateKey]);
+    
+    self.myCurrentTime = 0.0;
+    self.myTimer = [NSTimer scheduledTimerWithTimeInterval:0.05 target:self selector:@selector(updateProgress:) userInfo:nil repeats:YES];
     
 }
 
@@ -218,6 +229,9 @@ struct CAFAudioFormat {
         NSLog(@"Error: %@",[error localizedDescription]);
         self.outStatusLabel.text = @"Error";
     } else {
+        
+        NSLog(@"playback2 will be %f seconds long",self.audioPlayer.duration);
+        
         [self.audioPlayer prepareToPlay];
         [self.audioPlayer play];
         self.outStatusLabel.text = @"P1 started";
@@ -228,13 +242,33 @@ struct CAFAudioFormat {
     
     NSDictionary *dict = self.audioPlayer.settings;
     NSLog(@"sample rate is: %@", dict[AVSampleRateKey]);
+    
+    // add a progress bar.
+    
+    self.myCurrentTime = 0.0;
+    self.myTimer = [NSTimer scheduledTimerWithTimeInterval:0.02 target:self selector:@selector(updateProgress:) userInfo:nil repeats:YES];
+    
 
+}
+
+- (void)updateProgress:(NSTimer *)timer {
+    float percentage = self.audioPlayer.currentTime/self.audioPlayer.duration;
+    NSLog(@"update progress %f", percentage);
+    self.mainViewer.percentComplete = percentage;
+    [self redisplay];
+
+    
 }
 
 
 - (void)audioPlayerDidFinishPlaying:(AVAudioPlayer *)player successfully:(BOOL)flag {
     self.outStatusLabel.text = @"P finished";
     NSLog(@"playback finished");
+    
+    // stop any timer, if running.
+    [self.myTimer invalidate];
+    self.mainViewer.percentComplete = 0.0f;
+    [self redisplay];
 }
 
 - (IBAction)onAux1Button:(id)sender {
